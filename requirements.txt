@@ -1,0 +1,10 @@
+streamlit
+pandas
+chromadb
+ollama
+openpyxl
+unstructured
+gradio
+fastembed
+faiss-cpu
+llama-index-vector-stores-faiss

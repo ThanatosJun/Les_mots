@@ -1,0 +1,6 @@
+(for Embedding model)
+ollama pull mxbai-embed-large
+(for vector database)
+pip install chromadb
+(for LLM model)
+ollama run ycchen/breeze-7b-instruct-v1_0
