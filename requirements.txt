@@ -10,4 +10,5 @@ faiss-cpu
 llama-index-vector-stores-faiss
 playwright
 langchain
+langchain_community
 mermaid-py

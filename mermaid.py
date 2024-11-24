@@ -1,5 +1,4 @@
 from playwright.sync_api import sync_playwright
-import uuid
 def generate_mermaid_quadrantChart(mermaid_code: str):
     html_template = f"""
     <!DOCTYPE html>
