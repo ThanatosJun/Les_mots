@@ -3,7 +3,7 @@ from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 csv_file = "KnowledgeBase/French_Dictionary_Change.csv"
-loader = CSVLoader(file_path=csv_file)
+loader = CSVLoader(file_path=csv_file, encoding = "utf-8")
 print (loader)
 data = loader.load()
 print("data load finished")
