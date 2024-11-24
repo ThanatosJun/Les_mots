@@ -1,0 +1,10 @@
+# 忽略虛擬環境目錄
+venv/
+env/
+
+# 如果有使用 Windows 或 macOS，還可以加入以下內容：
+__pycache__/
+*.pyc
+
+# 忽略 VS Code 設定
+.vscode/

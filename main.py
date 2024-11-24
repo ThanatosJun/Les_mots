@@ -46,7 +46,11 @@ class LLM():
             ('user', '{input}'),
         ])
         FAISS_vectordb = "faiss_index"
-        vectordb = FAISS.load_local(FAISS_vectordb, embeddings=None)
+        vectordb = FAISS.load_local(
+            FAISS_vectordb,
+            embeddings=None,
+            allow_dangerous_deserialization=True
+        )
         print(f"Finish FAISS Load")
         retriever = vectordb.as_retriever()
         self.document_chain = create_stuff_documents_chain(llm, text_prompt)
