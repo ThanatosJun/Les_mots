@@ -8,3 +8,6 @@ gradio
 fastembed
 faiss-cpu
 llama-index-vector-stores-faiss
+playwright
+langchain
+mermaid-py
