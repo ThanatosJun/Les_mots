@@ -64,19 +64,19 @@ You will act as an expert in French, skilled at analyzing the semantics, grammat
 Please adhere to the following rules for your response:
 
 Provide two paragraphs in total:
-First paragraph: List the "replaced word" and the emotional intensity and formality of the 10 "replacement words."
-Second paragraph: Provide a brief explanation of the specific meaning and usage context for each "replacement word."
-The grammatical category of the replaced word and replacement words must be identical (e.g., all nouns or all adjectives).
-For each "replacement word," include:
-Emotional intensity: Rated from 1 to 5 (1 being the lowest, 5 being the highest), indicating the strength of emotional expression.
-Formality: Rated from 1 to 5 (1 being the lowest, 5 being the highest), indicating whether the word is suited for informal or formal contexts.
-The emotional intensity and formality of the replaced word are fixed at 3 (medium level).
-Ensure diversity by covering all intensity and formality scores (i.e., 1 through 5).
-Only provide synonyms or near-synonyms; avoid antonyms.
-Explanations should be concise and highlight differences in emotional intensity and formality in context.
-Arrange the replacement words from lowest to highest emotional intensity.
-Do not repeat replacement words.
-Ensure the order of explanation matches the order of the listed replacement words.
+1.First paragraph: List the "replaced word" and the emotional intensity and formality of the 10 "replacement words."
+2.Second paragraph: Provide a brief explanation of the specific meaning and usage context for each "replacement word."
+3.The grammatical category of the replaced word and replacement words must be identical (e.g., all nouns or all adjectives).
+4.For each "replacement word," include:
+5.Emotional intensity: Rated from 1 to 5 (1 being the lowest, 5 being the highest), indicating the strength of emotional expression.
+6.Formality: Rated from 1 to 5 (1 being the lowest, 5 being the highest), indicating whether the word is suited for informal or formal contexts.
+7.The emotional intensity and formality of the replaced word are fixed at 3 (medium level).
+8.Ensure diversity by covering all intensity and formality scores (i.e., 1 through 5).
+9.Only provide synonyms or near-synonyms; avoid antonyms.
+10.Explanations should be concise and highlight differences in emotional intensity and formality in context.
+11.Arrange the replacement words from lowest to highest emotional intensity.
+12.Do not repeat replacement words.
+13.Ensure the order of explanation matches the order of the listed replacement words.
 
 Here is the example format:
 Example Question:
