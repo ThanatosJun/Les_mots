@@ -37,7 +37,13 @@ class LLM():
                 - Arrange synonyms in ascending order of emotional intensity.
                 - Provide concise and accurate explanations.
                 - Do not repeat replacement words."""),
-            ('user', 'based on the context below :\n\n{context}\n to answer the question:{input}'),
+            ('system', """
+                <root> ::= <interview> | <interview> <interview>
+                <replacement> ::= <word> ": " <description>
+                <word> ::= /* 可填入任何自定義單詞 */
+                <description> ::= /* 可填入其他情緒的描述文字 */
+            """),
+            ('user', 'With zh-TW and based on the context below :\n\n{context}\n to answer the question directly:{input}'),
         ])
         emotion_prompt = ChatPromptTemplate.from_messages([
             ('system', """Your goal is to classify given datas into emotional intensity and formality range.
@@ -55,6 +61,16 @@ class LLM():
                 3. indignation: 情感強度：3 正式性：4
                 4. courroux: 情感強度：4 正式性：5
                 5. rage: 情感強度：5 正式性：1"""),
+            ('system', """
+                <root> ::= <primary_emotion> | <synonym_list>
+                <primary_emotion> ::= <word> <intensity_formality>
+                <synonym_list> ::= <synonym> | <synonym> <synonym_list>
+                <synonym> ::= <word> <intensity_formality>
+                <word> ::= /* 可以填入任何自定義單詞 */
+                <intensity_formality> ::= "情感強度：" <intensity> " 正式性：" <formality>
+                <intensity> ::= "1" | "2" | "3" | "4" | "5"
+                <formality> ::= "1" | "2" | "3" | "4" | "5"
+            """),
             ('user', "seperate from 1 to 5 in intensity and formality range:{input}")
         ])
 
@@ -65,6 +81,11 @@ class LLM():
                 - Coordinates must be expressed as [Emotional Intensity Value, Formality Value] (not as tuples or in any other format).
                 - Use the example format strictly, including title, axis labels, quadrant labels, and proper data representation.
                 - Emontional intensity value and formality value is in float only."""),
+            ('system', """
+                Additional Rules:
+                - All possitive values.
+                - Ensure all values are lower than 1 and larger than 0 in float.
+                - Depending on the words input from the user."""),
             ('system', """Here is an example of the expected input:
                 colère: 情感強度：3 正式性：3
                 替代詞：
@@ -73,10 +94,6 @@ class LLM():
                 3. indignation: 情感強度：3 正式性：4
                 4. courroux: 情感強度：4 正式性：5
                 5. rage: 情感強度：5 正式性：1"""),
-                    # quadrant-1 HE HF
-                    # quadrant-2 LE HF
-                    # quadrant-3 LE LF
-                    # quadrant-4 HE LF
             ('system', """Here is an example of the expected output:
                 quadrantChart
                     title Emotional Intensity and Formality
@@ -89,19 +106,18 @@ class LLM():
                     courroux: [0.75, 1]
                     rage: [1, 0]"""),
             ('system', """
-                Additional Rules:
-                - All possitive values.
-                - Ensure all values are be between 0 and 1 in float.
-                - The diagram should use the input data to compute coordinates as follows:
-                    - Emotional Intensity Value = (情緒強度 minus 1) divided by 4.
-                    - Formality Value = (正式性 minus 1) divided by 4.
-                    - Word: [Emotional Intensity Value, Formality Value].
-                        ex: colère: 情感強度：3 正式性：3
-                            colere: [0.5, 0.5] (in mermaid code)
-                            mécontentement: 情感強度：1 正式性：2
-                            mecontentement: [0, 0.25] (in mermaid code)
-                - Depending on the words input from the user."""),
-            ('user', 'Please use following imformation strictly to generate mermaid code of quadrantChart with the template:{input}'),
+                <root> ::= <quadrant_chart>
+                <quadrant_chart> ::= "quadrantChart" <title> <axes> <data_points>
+                <title> ::= "title Emotional Intensity and Formality"
+                <axes> ::= "x-axis Low Emotional Intensity --> High Emotional Intensity" 
+                        | "y-axis Low Formality --> High Formality"
+                <data_points> ::= <data_point> | <data_point> <data_points>
+                <data_point> ::= <word>: "[" <emotional_intensity_value> ", " <formality_value> "]"
+                <word> ::= /* 任意單詞 */
+                <emotional_intensity_value> ::= "0" | "0.25" | "0.5" | "0.75" | "1" | 0<=任何數值<=1
+                <formality_value> ::= "0" | "0.25" | "0.5" | "0.75" | "1" | 0<=任何數值<=1
+            """),
+            ('user', 'Please use every words strictly to generate mermaid code of quadrantChart with the template:{input}'),
         ])
         FAISS_vectordb = "faiss_FrenchWords202"
         vectordb = FAISS.load_local(
@@ -176,7 +192,7 @@ class GradioUI():
             ]
         )
     def launch(self):
-        self.ControllerView.launch()
+        self.ControllerView.launch(share = False, server_port=8080)
 
 if __name__ == "__main__":
     webUI = GradioUI()
