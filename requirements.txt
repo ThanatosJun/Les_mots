@@ -12,3 +12,4 @@ playwright
 langchain
 langchain_community
 mermaid-py
+unidecode

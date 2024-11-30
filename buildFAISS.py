@@ -2,7 +2,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
-csv_file = "KnowledgeBase/French_Dictionary_Change.csv"
+csv_file = "KnowledgeBase/newMotsv1.csv"
 loader = CSVLoader(file_path=csv_file, encoding = "utf-8")
 print (loader)
 data = loader.load()
@@ -13,5 +13,5 @@ print("text spliter finished")
 embeddings = OllamaEmbeddings(model="llama3.2")
 vectordb = FAISS.from_documents(documents, embeddings)
 print("FAISS vector finished")
-vectordb.save_local("faiss_FrenchWords")
-print("FAISS Save in faiss_FrenchWords")
+vectordb.save_local("faiss_FrenchWords202")
+print("FAISS Save in faiss_FrenchWords202")
