@@ -80,11 +80,19 @@ class LLM():
                 - Respond **only** with valid Mermaid code. Do not include explanations, greetings, or any additional text.
                 - Coordinates must be expressed as [Emotional Intensity Value, Formality Value] (not as tuples or in any other format).
                 - Use the example format strictly, including title, axis labels, quadrant labels, and proper data representation.
-                - Emontional intensity value and formality value is in float only."""),
+                - Emotional Intensity level and Formality level should be converted as follows:
+                    * If the level is 1, convert to 0 value.
+                    * If the level is 2, convert to 0.25 value.
+                    * If the level is 3, convert to 0.5 value.
+                    * If the level is 4, convert to 0.75 value.
+                    * If the level is 5, convert to 1 value.
+                    * If the level is 0~1, the value equal level minus 1 and divided by 4.
+                    * ex: agacement: 情感強度:2 正式性:3
+                        - agacement: [0.25, 0.5]
+                - Use the output template to response."""),
             ('system', """
                 Additional Rules:
-                - All possitive values.
-                - Ensure all values are lower than 1 and larger than 0 in float.
+                - All possitive values which are larger than 0 and lower than 1.
                 - Depending on the words input from the user."""),
             ('system', """Here is an example of the expected input:
                 colère: 情感強度：3 正式性：3
@@ -138,12 +146,12 @@ class LLM():
             'input': user_input,
             'context': RAG_context
         })['answer']
+        print(f"Finish Text Response: {first_response}")
         second_response = self.document_emotion_chain.invoke({
             'input': first_response
         })
-        text_response = first_response + "\n" + second_response
-        print(f"Finish Text Request\ntext_response = {text_response}")
-        return text_response, second_response, first_response
+        print(f"Finish Emotional Response: {second_response}")
+        return first_response, second_response
     
     def mermaid_code_request(self, llm_text):
         code_response = self.document_diagram_chain.invoke({'input': f"{llm_text}"})
@@ -168,14 +176,13 @@ class LLM():
         return init + output_code
 
     def question_request(self, user_input):
-        text_response, emotion_response, first_response = self.text_request(user_input)
+        text_response, emotion_response = self.text_request(user_input)
         mermaid_code = self.mermaid_code_request(emotion_response)
-        print(f"mermaid_code = {mermaid_code}")
         mermaid_code = self.clean_mermaid_code(mermaid_code)
         print(f"clean-code = \n{mermaid_code}")
         mermaid_diagram = self.mermaid_diagram_request(mermaid_code)
         print(f"Finish Answer")
-        return text_response, mermaid_diagram
+        return text_response, emotion_response, mermaid_code, mermaid_diagram
 
 
 class GradioUI():
@@ -183,14 +190,27 @@ class GradioUI():
     def __init__(self):
         user_input = []
         llm = LLM()
-        self.ControllerView = gr.Interface(
-            fn=llm.question_request, 
-            inputs=gr.Textbox(inputs=user_input, label="Mermaid Code"),
-            outputs=[
-                gr.Textbox(label="LLM Text Response"),
-                gr.Image(type="pil", label="Mermaid Diagram")
-            ]
-        )
+        with gr.Blocks() as app:
+            with gr.Row():
+                user_input = gr.Textbox(label="User Input", lines=2, placeholder="Enter your question here......")
+                user_output_text_response = gr.Textbox(label="LLM Text Response", lines=5)
+                user_output_emotion_response = gr.Textbox(label="LLM Emotion Response", lines=5)
+            user_button = gr.Button("Send Question")
+            with gr.Row():
+                user_output_code_response = gr.Textbox(label="LLM Emotion Response (editable)", lines=5, interactive=True)
+                mermaid_output = gr.Image(type="pil", label="Mermaid Diagram")
+            mermaid_button = gr.Button("Re Mermaid Diagram")
+            user_button.click(
+                fn=llm.question_request, 
+                inputs=user_input, 
+                outputs=[user_output_text_response, user_output_emotion_response, user_output_code_response, mermaid_output]
+            )
+            mermaid_button.click(
+                fn=llm.mermaid_diagram_request,
+                inputs=user_output_code_response,
+                outputs=mermaid_output
+            )
+        self.ControllerView = app
     def launch(self):
         self.ControllerView.launch(share = False, server_port=8080)
 

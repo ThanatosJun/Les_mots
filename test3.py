@@ -11,8 +11,9 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-grammar_path = "llama.cpp/grammars/japanese.gbnf"
-llm = OllamaLLM(model='llama3.2', grammar_path = grammar_path,  temperature=0.7)
+grammar_path = "llama.cpp/grammars/mermaid_code.gbnf"
+llm = OllamaLLM(model='llama3.2', temperature=0.7)
+llm_code = OllamaLLM(model='llama3.2', grammar_path = grammar_path,  temperature=0.5)
 embeddings = OllamaEmbeddings(model="llama3.2")
 text_prompt = ChatPromptTemplate.from_messages([
     ('system', 
@@ -37,7 +38,7 @@ text_prompt = ChatPromptTemplate.from_messages([
         - Provide concise and accurate explanations.
         - Do not repeat replacement words."""),
     ('system', """
-        <root> ::= <interview> | <interview> <interview>
+        <root> ::= <replacement> | <replacement> <replacement>
         <replacement> ::= <word> ": " <description>
         <word> ::= /* 可填入任何自定義單詞 */
         <description> ::= /* 可填入其他情緒的描述文字 */
@@ -98,11 +99,19 @@ code_prompt = ChatPromptTemplate.from_messages([
         - Respond **only** with valid Mermaid code. Do not include explanations, greetings, or any additional text.
         - Coordinates must be expressed as [Emotional Intensity Value, Formality Value] (not as tuples or in any other format).
         - Use the example format strictly, including title, axis labels, quadrant labels, and proper data representation.
-        - Emontional intensity value and formality value is in float only."""),
+        - Emotional Intensity level and Formality level should be converted as follows:
+            * If the level is 1, convert to 0 value.
+            * If the level is 2, convert to 0.25 value.
+            * If the level is 3, convert to 0.5 value.
+            * If the level is 4, convert to 0.75 value.
+            * If the level is 5, convert to 1 value.
+            * If the level is 0~1, the value equal level minus 1 and divided by 4.
+            * ex: agacement: 情感強度:2 正式性:3
+                - agacement: [0.25, 0.5]
+        - Use the output template to response."""),
     ('system', """
         Additional Rules:
-        - All possitive values.
-        - Ensure all values are lower than 1 and larger than 0 in float.
+        - All possitive values which are larger than 0 and lower than 1.
         - Depending on the words input from the user."""),
     ('system', """Here is an example of the expected input:
         colère: 情感強度：3 正式性：3
@@ -137,7 +146,7 @@ code_prompt = ChatPromptTemplate.from_messages([
     """),
     ('user', 'Please use every words strictly to generate mermaid code of quadrantChart with the template:{input}'),
 ])
-document_diagram_chain = code_prompt | llm
+document_diagram_chain = code_prompt | llm_code
 
 first_response = retrieval_chain.invoke({
     'input': user_input,
